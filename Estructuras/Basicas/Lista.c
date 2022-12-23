@@ -1,3 +1,6 @@
+/*
+	Implementacion de una Lista Enlazada
+*/
 #include <stdio.h>
 #include <stdlib.h>
 

@@ -1,3 +1,6 @@
+/*
+	Implementacion de una Cola Dinamica
+*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -76,7 +79,7 @@ int main(int argc, char const *argv[])
 
 void menu()
 {
-	printf("Select your option to choice: \n\t");
+	printf("Select your option to choice from the queue: \n\t");
 	printf("[1]: Insert\n\t[2]: Show\n\t[3]: Search\n\t[4]: Delete\n\t[0]: Exit\n> ");
 }
 

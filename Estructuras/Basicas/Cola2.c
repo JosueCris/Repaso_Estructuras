@@ -1,3 +1,7 @@
+/*
+	Implementacion de una Cola Dinamica manejado con dos apuntadores
+	Uno manipulando el frente y el otro el final de la estructura
+*/
 #include <stdio.h>
 #include <stdlib.h>
 
