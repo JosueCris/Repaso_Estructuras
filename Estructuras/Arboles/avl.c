@@ -26,7 +26,7 @@ int cant_nodes(Tree *root);
 int cant_leafs(Tree *root);
 int balance_factor(Tree *root);
 
-int parent_child(Tree *root, int N);
+Tree *get_parent(Tree *root, int N);
 
 int srl(Tree **root);
 int crl(Tree **root);
@@ -52,9 +52,9 @@ int main(int argc, char const *argv[])
 				printf("Insert the number: ");
 				scanf("%d", &number);
 				if (add(&avl_tree, number))
-                    printf("Added!!!");
+                    printf("Added!!! \n\n");
                 else
-                    printf("Error!!!");
+                    printf("Error!!! \n\n");
 				printf("\n");
                 system("clear || cls");
 				break;
@@ -75,37 +75,36 @@ int main(int argc, char const *argv[])
 				else
 					printf("No Exist!!! \n\n");
 				break;
-/*				
+				
 			case 4:
                 printf("Insert the number to delete: ");
 				scanf("%d", &number);
-				if (delete(&avl_tree, number) != 0)
-					printf("Deleted \n\n");
+				if (delete(&avl_tree, number))
+					printf("Deleted!!! \n\n");
 				else
-					printf("No delete!!!\n\n");
+					printf("Error!!!\n\n");
 				break;					
-*/			
+
 			case 5:
-                printf("Roots cant: %d \n\n", cant_nodes(avl_tree));
+                printf("About AVL Tree . . . \n");
+                printf("Nodes: %d \n", cant_nodes(avl_tree));
+                printf("Leafs: %d \n", cant_leafs(avl_tree));
+                printf("Height: %d \n", height(avl_tree));
+                printf("Balance Factor: %d \n\n", balance_factor(avl_tree));
 				break;
 
 			case 6:
-				printf("Leafs cant: %d \n\n", cant_leafs(avl_tree));
-                break;
-
-			case 7:
-                printf("Height from avl tree: %d \n\n", height(avl_tree));
-				break;
-
-			case 8:
                 printf("Insert the number to test: ");
                 scanf("%d", &number);
-                parent_child(avl_tree, number);
-				break;	
-
-            case 9:
-                printf("Balance factor from avl tree: %d \n\n", balance_factor(avl_tree));
-				break;		
+                Tree *parent = get_parent(avl_tree, number);
+                if (parent == NULL)
+                    printf("Root: %d \n\n", avl_tree->data);
+                else
+                {
+                    printf("Parent: %d \n", parent->data);
+                    printf("Child: %d \n\n", number);
+                }
+                break;
 
 			case 0:
 				printf("\nSee you later :D \n\n");
@@ -126,7 +125,7 @@ int main(int argc, char const *argv[])
 void menu()
 {
     printf("Select your option to choose from the avl tree: \n\t");
-	printf("[1]: Insert\n\t[2]: InOrden\n\t[3]: Search\n\t[4]: Delete\n\t[5]: Items\n\t[6]: Leafs\n\t[7]: Height\n\t[8]: Parent and Child\n\t[9]: Balance factor\n\t[0]: Exit\n> ");
+	printf("[1]: Insert\n\t[2]: InOrden\n\t[3]: Search\n\t[4]: Delete\n\t[5]: Information\n\t[6]: Parent - Child\n\t[0]: Exit\n> ");
 }
 
 
@@ -205,6 +204,40 @@ Tree **right_most(Tree **root)
 }
 
 
+int delete(Tree **root, int N)
+{
+    if (is_empty(*root))
+        return 0; // No se encontró el elemento a eliminar
+    if (N < (*root)->data)
+        return delete(&(*root)->left, N);
+    if (N > (*root)->data)
+        return delete(&(*root)->right, N);
+
+    // Si encontramos el nodo a eliminar
+    if (is_empty((*root)->left))
+    {
+        Tree *temp = (*root)->right;
+        free(*root);
+        *root = temp;
+    }
+    else if (is_empty((*root)->right))
+    {
+        Tree *temp = (*root)->left;
+        free(*root);
+        *root = temp;
+    }
+    else
+    {
+        // Si el nodo tiene dos hijos, buscamos el sucesor inmediato
+        Tree **successor = right_most(&(*root)->left);
+        (*root)->data = (*successor)->data;
+        delete(successor, (*successor)->data);
+    }
+    balance_tree(root);
+    return 1;
+}
+
+
 int max(int left, int right)
 {
     return (left > right) ? left : right;
@@ -247,46 +280,16 @@ int balance_factor(Tree *root)
 }
 
 
-int parent_child(Tree *root, int N)
+Tree *get_parent(Tree *root, int N)
 {
     if (is_empty(root))
-        return 0;
-        
-    if (root->data == N)
-    {
-        printf("Root: %i \n", root->data);
-        return 1;
-    }
-    if (root->data > N)
-    {
-        if (!is_empty(root->left))
-        {
-            if (root->left->data == N)
-            {
-                printf("Parent: %i \n", root->data);
-                printf("Child: %i \n", root->left->data);
-                return 1;
-            }
-        }
-        return parent_child(root->left, N);
-    }
+        return NULL; // No se encontró el elemento a eliminar
+    if ((root->left && root->left->data == N) || (root->right && root->right->data == N))
+        return root;
+    if (N < root->data)
+        return get_parent(root->left, N);
     else
-    {
-        if (root->data < N)
-        {
-            if (!is_empty(root->right))
-            {
-                if (root->right->data == N)
-                {
-                    printf("Parent: %i \n", root->data);
-                    printf("Child: %i \n", root->right->data);
-                    return 1;
-                }
-            }
-            return parent_child(root->right, N);
-        }
-    }
-    return 1;
+        return get_parent(root->right, N);
 }
 
 
